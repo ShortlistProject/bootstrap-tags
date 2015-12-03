@@ -1,5 +1,5 @@
 /*!
- * bootstrap-tags 1.1.5
+ * bootstrap-tags 1.1.6
  * https://github.com/maxwells/bootstrap-tags
  * Copyright 2013 Max Lahey; Licensed MIT
  */
@@ -102,7 +102,7 @@
                 };
                 this.removeTagClicked = function(e) {
                     if (e.currentTarget.tagName === "A") {
-                        _this.removeTag($("span", e.currentTarget.parentElement).html());
+                        _this.removeTag($("span", e.currentTarget.parentElement).text());
                         $(e.currentTarget.parentNode).remove();
                     }
                     return _this;
@@ -190,7 +190,7 @@
                         e.preventDefault();
                         _this.pressedReturn(e);
                         tag = e.target.value;
-                        if (_this.suggestedIndex !== -1) {
+                        if (_this.suggestedIndex != null && _this.suggestedIndex !== -1) {
                             tag = _this.suggestionList[_this.suggestedIndex];
                         }
                         _this.addTag(tag);
