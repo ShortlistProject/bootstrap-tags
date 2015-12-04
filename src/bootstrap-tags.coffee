@@ -25,6 +25,7 @@ jQuery ->
     @tagSize ||= 'md'
     @promptText ||= 'Enter tags...'
     @defaultPlaceholderText ||= ''
+    @maxLength
     @caseInsensitive ||= false
     @readOnlyEmptyMessage ||= 'No tags to display...'
     @maxNumTags ||= -1
@@ -317,6 +318,7 @@ jQuery ->
       tagList = @$('.tags')
       tagList.html('')
       @input.attr 'placeholder', (if @tagsArray.length == 0 then @promptText else @defaultPlaceholderText)
+      @input.attr 'maxlength', @maxLength if @maxLength
       $.each @tagsArray, (i, tag) =>
         tag = $(@formatTag i, tag)
         $('a', tag).click @removeTagClicked
