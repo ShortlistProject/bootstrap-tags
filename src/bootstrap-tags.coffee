@@ -24,6 +24,7 @@ jQuery ->
     @tagClass ||= 'btn-info'
     @tagSize ||= 'md'
     @promptText ||= 'Enter tags...'
+    @defaultPlaceholderText ||= ''
     @caseInsensitive ||= false
     @readOnlyEmptyMessage ||= 'No tags to display...'
     @maxNumTags ||= -1
@@ -315,7 +316,7 @@ jQuery ->
     @renderTags = =>
       tagList = @$('.tags')
       tagList.html('')
-      @input.attr 'placeholder', (if @tagsArray.length == 0 then @promptText else '')
+      @input.attr 'placeholder', (if @tagsArray.length == 0 then @promptText else @defaultPlaceholderText)
       $.each @tagsArray, (i, tag) =>
         tag = $(@formatTag i, tag)
         $('a', tag).click @removeTagClicked
