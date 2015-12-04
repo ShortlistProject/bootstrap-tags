@@ -1,5 +1,5 @@
 /*!
- * bootstrap-tags 1.1.6
+ * bootstrap-tags 1.1.7
  * https://github.com/maxwells/bootstrap-tags
  * Copyright 2013 Max Lahey; Licensed MIT
  */
@@ -28,9 +28,12 @@
                 this.tagClass || (this.tagClass = "btn-info");
                 this.tagSize || (this.tagSize = "md");
                 this.promptText || (this.promptText = "Enter tags...");
+                this.defaultPlaceholderText || (this.defaultPlaceholderText = "");
+                this.maxLength;
                 this.caseInsensitive || (this.caseInsensitive = false);
                 this.readOnlyEmptyMessage || (this.readOnlyEmptyMessage = "No tags to display...");
                 this.maxNumTags || (this.maxNumTags = -1);
+                this.minTagInputWidth = 0;
                 this.beforeAddingTag || (this.beforeAddingTag = function(tag) {});
                 this.afterAddingTag || (this.afterAddingTag = function(tag) {});
                 this.beforeDeletingTag || (this.beforeDeletingTag = function(tag) {});
@@ -325,12 +328,20 @@
                     }
                 };
                 this.adjustInputPosition = function() {
-                    var pBottom, pLeft, pTop, pWidth, tagElement, tagPosition;
+                    var pBottom, pLeft, pTop, pWidth, tagElement, tagListWidth, tagPosition;
                     tagElement = _this.$(".tag").last();
                     tagPosition = tagElement.position();
-                    pLeft = tagPosition != null ? tagPosition.left + tagElement.outerWidth(true) : 0;
+                    tagListWidth = _this.$element.width();
                     pTop = tagPosition != null ? tagPosition.top : 0;
-                    pWidth = _this.$element.width() - pLeft;
+                    pLeft = 0;
+                    if (tagPosition != null) {
+                        pLeft = tagPosition.left + tagElement.outerWidth(true);
+                        if (pLeft + _this.minTagInputWidth >= tagListWidth) {
+                            pLeft = 0;
+                            pTop += tagElement.outerHeight(true);
+                        }
+                    }
+                    pWidth = tagListWidth - pLeft;
                     $(".tags-input", _this.$element).css({
                         paddingLeft: Math.max(pLeft, 0),
                         paddingTop: Math.max(pTop, 0),
@@ -345,7 +356,10 @@
                     var tagList;
                     tagList = _this.$(".tags");
                     tagList.html("");
-                    _this.input.attr("placeholder", _this.tagsArray.length === 0 ? _this.promptText : "");
+                    _this.input.attr("placeholder", _this.tagsArray.length === 0 ? _this.promptText : _this.defaultPlaceholderText);
+                    if (_this.maxLength) {
+                        _this.input.attr("maxlength", _this.maxLength);
+                    }
                     $.each(_this.tagsArray, function(i, tag) {
                         tag = $(_this.formatTag(i, tag));
                         $("a", tag).click(_this.removeTagClicked);
@@ -356,7 +370,9 @@
                         }
                         return tagList.append(tag);
                     });
-                    return _this.adjustInputPosition();
+                    return setTimeout(function() {
+                        return _this.adjustInputPosition();
+                    }, 50);
                 };
                 this.renderReadOnly = function() {
                     var tagList;
@@ -463,6 +479,7 @@
                         this.$element.append(this.input);
                         this.$suggestionList = $(this.template("suggestion_list"));
                         this.$element.append(this.$suggestionList);
+                        this.minTagInputWidth = Math.max($(".tags-input", this.$element).width(1).width());
                         this.renderTags();
                         if (!this.canAddByMaxNum()) {
                             this.disableInput();
