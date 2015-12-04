@@ -29,6 +29,7 @@ jQuery ->
     @caseInsensitive ||= false
     @readOnlyEmptyMessage ||= 'No tags to display...'
     @maxNumTags ||= -1
+    @minTagInputWidth = 0
 
     # callbacks
     @beforeAddingTag ||= (tag) ->
@@ -303,9 +304,17 @@ jQuery ->
     @adjustInputPosition = =>
       tagElement = @$('.tag').last()
       tagPosition = tagElement.position()
-      pLeft = if tagPosition? then tagPosition.left + tagElement.outerWidth(true) else 0
+      tagListWidth = @$element.width()
+
       pTop = if tagPosition? then tagPosition.top else 0
-      pWidth = @$element.width() - pLeft
+      pLeft = 0
+      if tagPosition?
+        pLeft = tagPosition.left + tagElement.outerWidth(true)
+        if (pLeft + @minTagInputWidth) >= tagListWidth
+          pLeft = 0
+          pTop += tagElement.outerHeight(true)
+      pWidth = tagListWidth - pLeft
+
       $('.tags-input', @$element).css
         paddingLeft : Math.max pLeft, 0
         paddingTop  : Math.max pTop, 0
@@ -327,7 +336,6 @@ jQuery ->
         @initializePopoverFor(tag, @tagsArray[i], @popoverArray[i]) if @displayPopovers
         tagList.append tag
       setTimeout =>
-        console.log '!!!'
         @adjustInputPosition()
       , 50
 
@@ -424,6 +432,10 @@ jQuery ->
         @$element.append @input
         @$suggestionList = $(@template("suggestion_list"))
         @$element.append @$suggestionList
+
+        # Check for minimum input width (e.g. set by min-width)
+        @minTagInputWidth = Math.max $('.tags-input', @$element).width(1).width()
+
         # show it
         @renderTags()
 
