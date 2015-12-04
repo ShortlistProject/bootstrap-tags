@@ -1,5 +1,5 @@
 /*!
- * bootstrap-tags 1.1.7
+ * bootstrap-tags 1.1.8
  * https://github.com/maxwells/bootstrap-tags
  * Copyright 2013 Max Lahey; Licensed MIT
  */
@@ -342,12 +342,15 @@
                         }
                     }
                     pWidth = tagListWidth - pLeft;
+                    if (pWidth === 0) {
+                        pWidth = "100%";
+                    }
                     $(".tags-input", _this.$element).css({
                         paddingLeft: Math.max(pLeft, 0),
                         paddingTop: Math.max(pTop, 0),
                         width: pWidth
                     });
-                    pBottom = tagPosition != null ? tagPosition.top + tagElement.outerHeight(true) : 22;
+                    pBottom = tagPosition != null ? tagPosition.top + tagElement.outerHeight(true) : 0;
                     return _this.$element.css({
                         paddingBottom: pBottom - _this.$element.height()
                     });
