@@ -314,12 +314,13 @@ jQuery ->
           pLeft = 0
           pTop += tagElement.outerHeight(true)
       pWidth = tagListWidth - pLeft
+      pWidth = '100%' if pWidth is 0
 
       $('.tags-input', @$element).css
         paddingLeft : Math.max pLeft, 0
         paddingTop  : Math.max pTop, 0
         width       : pWidth
-      pBottom = if tagPosition? then tagPosition.top + tagElement.outerHeight(true) else 22  
+      pBottom = if tagPosition? then tagPosition.top + tagElement.outerHeight(true) else 0
       @$element.css paddingBottom : pBottom - @$element.height()
 
     # renderTags renders tags...
