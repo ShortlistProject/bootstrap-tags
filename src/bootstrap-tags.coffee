@@ -336,9 +336,10 @@ jQuery ->
         $('a', tag).mouseout @toggleCloseColor
         @initializePopoverFor(tag, @tagsArray[i], @popoverArray[i]) if @displayPopovers
         tagList.append tag
+      @adjustInputPosition()
       setTimeout =>
         @adjustInputPosition()
-      , 50
+      , 200
 
     @renderReadOnly = =>
       tagList = @$('.tags')

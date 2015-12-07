@@ -1,5 +1,5 @@
 /*!
- * bootstrap-tags 1.1.8
+ * bootstrap-tags 1.1.9
  * https://github.com/maxwells/bootstrap-tags
  * Copyright 2013 Max Lahey; Licensed MIT
  */
@@ -373,9 +373,10 @@
                         }
                         return tagList.append(tag);
                     });
+                    _this.adjustInputPosition();
                     return setTimeout(function() {
                         return _this.adjustInputPosition();
-                    }, 50);
+                    }, 200);
                 };
                 this.renderReadOnly = function() {
                     var tagList;
