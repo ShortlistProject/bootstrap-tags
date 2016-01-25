@@ -16,6 +16,8 @@ jQuery ->
     # set defaults if no option was set
     @readOnly ||= false
     @suggestOnClick ||= false
+    @ajaxSuggestions ||= false
+    @allowOnlySuggestedTags ||= false
     @suggestions ||= []
     @restrictTo = (if options.restrictTo? then options.restrictTo.concat @suggestions else false)
     @exclude ||= false
@@ -30,15 +32,16 @@ jQuery ->
     @readOnlyEmptyMessage ||= 'No tags to display...'
     @maxNumTags ||= -1
     @minTagInputWidth = 0
+    @suggestionList = []
 
     # callbacks
     @beforeAddingTag ||= (tag) ->
-    @afterAddingTag ||= (tag) -> 
+    @afterAddingTag ||= (tag) ->
     @beforeDeletingTag ||= (tag) ->
     @afterDeletingTag ||= (tag) ->
 
     # override-able functions
-    @definePopover ||= (tag) -> "associated content for \""+tag+"\"" 
+    @definePopover ||= (tag) -> "associated content for \""+tag+"\""
     @excludes ||= -> false
     @tagRemoved ||= (tag) ->
 
@@ -96,14 +99,14 @@ jQuery ->
     ####################
 
     # removeTagClicked is called when user clicks remove tag anchor (x)
-    @removeTagClicked = (e) => # 
+    @removeTagClicked = (e) => #
       if e.currentTarget.tagName == "A"
         @removeTag $("span", e.currentTarget.parentElement).text()
         $(e.currentTarget.parentNode).remove()
       @
 
     # removeLastTag is called when user presses delete on empty input.
-    @removeLastTag = => 
+    @removeLastTag = =>
       if @tagsArray.length > 0
         @removeTag @tagsArray[@tagsArray.length-1]
         @enableInput() if @canAddByMaxNum()
@@ -112,7 +115,7 @@ jQuery ->
     # removeTag removes specified tag.
     # - Helper method for removeTagClicked and removeLast Tag
     # - also an exposed method (can be called from page javascript)
-    @removeTag = (tag) => # removes specified tag 
+    @removeTag = (tag) => # removes specified tag
       if @tagsArray.indexOf(tag) > -1
         return if @beforeDeletingTag(tag) == false
         @popoverArray.splice(@tagsArray.indexOf(tag),1)
@@ -167,8 +170,8 @@ jQuery ->
     # It is an exposed method: can be called from page javascript
     @setPopover = (tag, popoverContent) =>
       @popoverArray[@tagsArray.indexOf tag] = popoverContent
-      @renderTags()     
-      @ 
+      @renderTags()
+      @
 
     ###########################
     # User Input & Key handlers
@@ -234,15 +237,28 @@ jQuery ->
       val ?= (if e.target.value? then e.target.value else e.target.textContent)
       @suggestedIndex = -1
       @$suggestionList.html ''
-      $.each @getSuggestions(val, overrideLengthCheck), (i, suggestion) =>
-        @$suggestionList.append @template 'tags_suggestion',
-          suggestion: suggestion
-      @$('.tags-suggestion').mouseover @selectSuggestedMouseOver
-      @$('.tags-suggestion').click @suggestedClicked
-      if @suggestionList.length > 0
-        @showSuggestions()
+
+      populateSuggestions = (suggestions) =>
+        $.each suggestions, (i, suggestion) =>
+          @$suggestionList.append @template 'tags_suggestion',
+            suggestion: suggestion
+        @$('.tags-suggestion').mouseover @selectSuggestedMouseOver
+        @$('.tags-suggestion').click @suggestedClicked
+        if @suggestionList.length > 0
+          @showSuggestions()
+        else
+          @hideSuggestions() # so the rounded parts on top & bottom of dropdown do not show up
+
+      if typeof @ajaxSuggestions == 'function'
+        @suggestions = []
+        @ajaxSuggestions(val).then (suggestions) =>
+          @suggestedIndex = -1
+          @$suggestionList.html ''
+          @suggestionList = @suggestions = suggestions
+          @restrictTo = @suggestionList if @allowOnlySuggestedTags is true
+          populateSuggestions @suggestionList
       else
-        @hideSuggestions() # so the rounded parts on top & bottom of dropdown do not show up
+        populateSuggestions @getSuggestions(val, overrideLengthCheck)
 
     # triggered when user clicked on a suggestion
     @suggestedClicked = (e) =>
@@ -374,14 +390,14 @@ jQuery ->
       else
         options.trigger = @popoverTrigger
       $(tag).popover options
-          
+
 
     # toggles remove button opacity for a tag when moused over or out
     @toggleCloseColor = (e) ->
       tagAnchor = $ e.currentTarget
       opacity = tagAnchor.css('opacity')
       opacity = (if opacity < 0.8 then 1.0 else 0.6)
-      tagAnchor.css opacity:opacity 
+      tagAnchor.css opacity:opacity
 
     # formatTag spits out the html for a tag (with or without it's popovers)
     @formatTag = (i, tag, isReadOnly = false) =>
@@ -444,7 +460,7 @@ jQuery ->
         @disableInput() unless @canAddByMaxNum()
 
         @addDocumentListeners()
-      
+
     @init()
 
     @

@@ -1,5 +1,5 @@
 /*!
- * bootstrap-tags 1.1.9
+ * bootstrap-tags 1.2.0
  * https://github.com/maxwells/bootstrap-tags
  * Copyright 2013 Max Lahey; Licensed MIT
  */
@@ -20,6 +20,8 @@
                 this.bootstrapVersion || (this.bootstrapVersion = "3");
                 this.readOnly || (this.readOnly = false);
                 this.suggestOnClick || (this.suggestOnClick = false);
+                this.ajaxSuggestions || (this.ajaxSuggestions = false);
+                this.allowOnlySuggestedTags || (this.allowOnlySuggestedTags = false);
                 this.suggestions || (this.suggestions = []);
                 this.restrictTo = options.restrictTo != null ? options.restrictTo.concat(this.suggestions) : false;
                 this.exclude || (this.exclude = false);
@@ -34,6 +36,7 @@
                 this.readOnlyEmptyMessage || (this.readOnlyEmptyMessage = "No tags to display...");
                 this.maxNumTags || (this.maxNumTags = -1);
                 this.minTagInputWidth = 0;
+                this.suggestionList = [];
                 this.beforeAddingTag || (this.beforeAddingTag = function(tag) {});
                 this.afterAddingTag || (this.afterAddingTag = function(tag) {});
                 this.beforeDeletingTag || (this.beforeDeletingTag = function(tag) {});
@@ -263,22 +266,39 @@
                     return this.suggestionList;
                 };
                 this.makeSuggestions = function(e, overrideLengthCheck, val) {
+                    var populateSuggestions;
                     if (val == null) {
                         val = e.target.value != null ? e.target.value : e.target.textContent;
                     }
                     _this.suggestedIndex = -1;
                     _this.$suggestionList.html("");
-                    $.each(_this.getSuggestions(val, overrideLengthCheck), function(i, suggestion) {
-                        return _this.$suggestionList.append(_this.template("tags_suggestion", {
-                            suggestion: suggestion
-                        }));
-                    });
-                    _this.$(".tags-suggestion").mouseover(_this.selectSuggestedMouseOver);
-                    _this.$(".tags-suggestion").click(_this.suggestedClicked);
-                    if (_this.suggestionList.length > 0) {
-                        return _this.showSuggestions();
+                    populateSuggestions = function(suggestions) {
+                        $.each(suggestions, function(i, suggestion) {
+                            return _this.$suggestionList.append(_this.template("tags_suggestion", {
+                                suggestion: suggestion
+                            }));
+                        });
+                        _this.$(".tags-suggestion").mouseover(_this.selectSuggestedMouseOver);
+                        _this.$(".tags-suggestion").click(_this.suggestedClicked);
+                        if (_this.suggestionList.length > 0) {
+                            return _this.showSuggestions();
+                        } else {
+                            return _this.hideSuggestions();
+                        }
+                    };
+                    if (typeof _this.ajaxSuggestions === "function") {
+                        _this.suggestions = [];
+                        return _this.ajaxSuggestions(val).then(function(suggestions) {
+                            _this.suggestedIndex = -1;
+                            _this.$suggestionList.html("");
+                            _this.suggestionList = _this.suggestions = suggestions;
+                            if (_this.allowOnlySuggestedTags === true) {
+                                _this.restrictTo = _this.suggestionList;
+                            }
+                            return populateSuggestions(_this.suggestionList);
+                        });
                     } else {
-                        return _this.hideSuggestions();
+                        return populateSuggestions(_this.getSuggestions(val, overrideLengthCheck));
                     }
                 };
                 this.suggestedClicked = function(e) {
