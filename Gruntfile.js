@@ -16,7 +16,7 @@ module.exports = function(grunt) {
       options: {
         banner: [
           '/*!',
-          ' * bootstrap-tags 1.2.0',
+          ' * bootstrap-tags 1.2.1',
           ' * https://github.com/maxwells/bootstrap-tags',
           ' * Copyright 2013 Max Lahey; Licensed MIT',
           ' */\n\n'
