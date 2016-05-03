@@ -251,6 +251,7 @@ jQuery ->
 
       if typeof @ajaxSuggestions == 'function'
         @suggestions = []
+        @restrictTo = [] if @allowOnlySuggestedTags is true
         @ajaxSuggestions(val).then (suggestions) =>
           @suggestedIndex = -1
           @$suggestionList.html ''

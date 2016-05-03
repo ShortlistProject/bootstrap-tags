@@ -1,5 +1,5 @@
 /*!
- * bootstrap-tags 1.2.0
+ * bootstrap-tags 1.2.2
  * https://github.com/maxwells/bootstrap-tags
  * Copyright 2013 Max Lahey; Licensed MIT
  */
@@ -288,6 +288,9 @@
                     };
                     if (typeof _this.ajaxSuggestions === "function") {
                         _this.suggestions = [];
+                        if (_this.allowOnlySuggestedTags === true) {
+                            _this.restrictTo = [];
+                        }
                         return _this.ajaxSuggestions(val).then(function(suggestions) {
                             _this.suggestedIndex = -1;
                             _this.$suggestionList.html("");
@@ -609,7 +612,7 @@
             if (options == null) {
                 options = {};
             }
-            return "<div class='tag label " + options.tagClass + " " + options.tagSize + "' " + (options.isPopover ? "rel='popover'" : "") + ">    <span>" + Tags.Helpers.addPadding(options.tag, 2, options.isReadOnly) + "</span>    " + (options.isReadOnly ? "" : "<a><i class='remove glyphicon glyphicon-remove-sign glyphicon-white' /></a>") + "  </div>";
+            return "<div class='tag label " + options.tagClass + " " + options.tagSize + "' " + (options.isPopover ? "rel='popover'" : "") + ">    <span>" + Tags.Helpers.addPadding(options.tag, 2, options.isReadOnly) + "</span>    " + (options.isReadOnly ? "" : "<a><i class='material-icons'>clear</i></a>") + "  </div>";
         };
     }).call(this);
     (function() {
