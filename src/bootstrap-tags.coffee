@@ -201,7 +201,7 @@ jQuery ->
             @hideSuggestions()
         when 40 # down
           @pressedDown(e)
-          if @input.val() == '' and (@suggestedIndex == -1 || !@suggestedIndex?)
+          if @suggestionList.length is 0 and @input.val() == '' and (@suggestedIndex == -1 || !@suggestedIndex?)
             @makeSuggestions e, true
           numSuggestions = @suggestionList.length
           @suggestedIndex = (if @suggestedIndex < numSuggestions-1 then @suggestedIndex+1 else numSuggestions-1)
@@ -281,6 +281,8 @@ jQuery ->
     # - user selects a suggestion
     # - user presses escape
     @hideSuggestions = =>
+      @suggestionList = []
+      @suggestedIndex = -1
       @$('.tags-suggestion-list').css display: "none"
 
     # showSuggetions is called when:

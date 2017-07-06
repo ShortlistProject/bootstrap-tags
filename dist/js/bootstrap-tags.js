@@ -217,7 +217,7 @@
 
                       case 40:
                         _this.pressedDown(e);
-                        if (_this.input.val() === "" && (_this.suggestedIndex === -1 || _this.suggestedIndex == null)) {
+                        if (_this.suggestionList.length === 0 && _this.input.val() === "" && (_this.suggestedIndex === -1 || _this.suggestedIndex == null)) {
                             _this.makeSuggestions(e, true);
                         }
                         numSuggestions = _this.suggestionList.length;
@@ -316,6 +316,8 @@
                     return _this.hideSuggestions();
                 };
                 this.hideSuggestions = function() {
+                    _this.suggestionList = [];
+                    _this.suggestedIndex = -1;
                     return _this.$(".tags-suggestion-list").css({
                         display: "none"
                     });
