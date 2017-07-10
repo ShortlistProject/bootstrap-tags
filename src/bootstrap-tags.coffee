@@ -134,10 +134,14 @@ jQuery ->
     @canAddByMaxNum = ->
       @maxNumTags == -1 or @tagsArray.length < @maxNumTags
 
+    @normalizeTag = (tag) ->
+      String(tag).trim()
+
     # addTag adds the specified tag
     # - Helper method for keyDownHandler and suggestedClicked
     # - exposed: can be called from page javascript
     @addTag = (tag) =>
+      tag = @normalizeTag(tag)
       if @canAddByRestriction(tag) and !@hasTag(tag) and tag.length > 0 and @canAddByExclusion(tag) and @canAddByMaxNum()
         return if @beforeAddingTag(tag) == false
         associatedContent = @definePopover(tag)

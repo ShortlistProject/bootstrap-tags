@@ -146,8 +146,12 @@
                 this.canAddByMaxNum = function() {
                     return this.maxNumTags === -1 || this.tagsArray.length < this.maxNumTags;
                 };
+                this.normalizeTag = function(tag) {
+                    return String(tag).trim();
+                };
                 this.addTag = function(tag) {
                     var associatedContent;
+                    tag = _this.normalizeTag(tag);
                     if (_this.canAddByRestriction(tag) && !_this.hasTag(tag) && tag.length > 0 && _this.canAddByExclusion(tag) && _this.canAddByMaxNum()) {
                         if (_this.beforeAddingTag(tag) === false) {
                             return;
