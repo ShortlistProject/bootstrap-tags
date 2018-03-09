@@ -469,9 +469,11 @@
                 };
                 this.addDocumentListeners = function() {
                     return $(document).mouseup(function(e) {
-                        var container;
-                        container = _this.$(".tags-suggestion-list");
-                        if (container.has(e.target).length === 0) {
+                        var container, containerClass, target;
+                        containerClass = "tags-suggestion-list";
+                        container = _this.$("." + containerClass);
+                        target = _this.$(e.target);
+                        if (container.has(e.target).length === 0 && !target.hasClass(containerClass)) {
                             return _this.hideSuggestions();
                         }
                     });

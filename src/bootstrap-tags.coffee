@@ -418,8 +418,10 @@ jQuery ->
 
     @addDocumentListeners = =>
       $(document).mouseup (e) =>
-        container = @$('.tags-suggestion-list')
-        if container.has(e.target).length == 0
+        containerClass = 'tags-suggestion-list'
+        container = @$('.' + containerClass)
+        target = @$(e.target)
+        if (container.has(e.target).length == 0) and !target.hasClass(containerClass)
           @hideSuggestions()
 
     @template = (name, options) ->
