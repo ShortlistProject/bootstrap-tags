@@ -51,6 +51,25 @@ jQuery ->
     @pressedDown ||= (e) ->
     @pressedUp ||= (e) ->
 
+    # create escaper
+    createEscaper = (map) ->
+      escaper = (match) -> map[match]
+      source = '(?:' + _.keys(map).join('|') + ')';
+      testRegexp = RegExp(source);
+      replaceRegexp = RegExp(source, 'g');
+      return (string) ->
+        string = if (string == null) then '' else '' + string;
+        return if testRegexp.test(string) then string.replace(replaceRegexp, escaper) else string;
+  
+    @escape = createEscaper(
+      '&': '&amp;'
+      '<': '&lt;'
+      '>': '&gt;'
+      '"': '&quot;'
+      "'": '&#x27;'
+      '`': '&#x60;'
+    );
+
     # hang on to so we know who we are
     @$element = $(element)
 
@@ -245,7 +264,7 @@ jQuery ->
       populateSuggestions = (suggestions) =>
         $.each suggestions, (i, suggestion) =>
           @$suggestionList.append @template 'tags_suggestion',
-            suggestion: suggestion
+            suggestion: @escape(suggestion)
         @$('.tags-suggestion').mouseover @selectSuggestedMouseOver
         @$('.tags-suggestion').click @suggestedClicked
         if @suggestionList.length > 0
@@ -408,7 +427,7 @@ jQuery ->
 
     # formatTag spits out the html for a tag (with or without it's popovers)
     @formatTag = (i, tag, isReadOnly = false) =>
-      escapedTag = tag.replace("<",'&lt;').replace(">",'&gt;')
+      escapedTag = @escape tag
       @template "tag",
         tag: escapedTag
         tagClass: @tagClass

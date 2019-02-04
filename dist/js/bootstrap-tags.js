@@ -9,7 +9,7 @@
         window.Tags || (window.Tags = {});
         jQuery(function() {
             $.tags = function(element, options) {
-                var key, tag, tagData, value, _i, _len, _ref, _this = this;
+                var createEscaper, key, tag, tagData, value, _i, _len, _ref, _this = this;
                 if (options == null) {
                     options = {};
                 }
@@ -52,6 +52,31 @@
                 this.pressedDelete || (this.pressedDelete = function(e) {});
                 this.pressedDown || (this.pressedDown = function(e) {});
                 this.pressedUp || (this.pressedUp = function(e) {});
+                createEscaper = function(map) {
+                    var escaper, replaceRegexp, source, testRegexp;
+                    escaper = function(match) {
+                        return map[match];
+                    };
+                    source = "(?:" + _.keys(map).join("|") + ")";
+                    testRegexp = RegExp(source);
+                    replaceRegexp = RegExp(source, "g");
+                    return function(string) {
+                        string = string === null ? "" : "" + string;
+                        if (testRegexp.test(string)) {
+                            return string.replace(replaceRegexp, escaper);
+                        } else {
+                            return string;
+                        }
+                    };
+                };
+                this.escape = createEscaper({
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#x27;",
+                    "`": "&#x60;"
+                });
                 this.$element = $(element);
                 if (options.tagData != null) {
                     this.tagsArray = options.tagData;
@@ -279,7 +304,7 @@
                     populateSuggestions = function(suggestions) {
                         $.each(suggestions, function(i, suggestion) {
                             return _this.$suggestionList.append(_this.template("tags_suggestion", {
-                                suggestion: suggestion
+                                suggestion: _this.escape(suggestion)
                             }));
                         });
                         _this.$(".tags-suggestion").mouseover(_this.selectSuggestedMouseOver);
@@ -458,7 +483,7 @@
                     if (isReadOnly == null) {
                         isReadOnly = false;
                     }
-                    escapedTag = tag.replace("<", "&lt;").replace(">", "&gt;");
+                    escapedTag = _this.escape(tag);
                     return _this.template("tag", {
                         tag: escapedTag,
                         tagClass: _this.tagClass,
